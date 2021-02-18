@@ -29,7 +29,7 @@ def get_tasks():
 def register():
     if request.method == "POST":
         # check if username already exists in db
-        existing_user = mongo.db.users.find_one(
+        existing_user = mongo.db.user.find_one(
             {"username": request.form.get("username").lower()})
 
         if existing_user:
@@ -53,8 +53,11 @@ def register():
 def login():
     if request.method == "POST":
         # check if username exists in db
-        existing_user = mongo.db.users.find_one(
+        existing_user = mongo.db.user.find_one(
             {"username": request.form.get("username").lower()})
+        
+        print(f"EXISTING_USER: {existing_user}")
+        print(f"REQUEST FORM: {request.form}")
 
         if existing_user:
             # ensure hashed password matches user input
@@ -67,12 +70,12 @@ def login():
                     "profile", username=session["user"]))
             else:
                 # invalid password match
-                flash("Incorrect Username and/or Password")
+                flash("Incorrect Username and/or Password1")
                 return redirect(url_for("login"))
 
         else:
             # username doesn't exist
-            flash("Incorrect Username and/or Password")
+            flash("Incorrect Username and/or Password2")
             return redirect(url_for("login"))
 
     return render_template("login.html")
@@ -81,7 +84,7 @@ def login():
 @app.route("/profile/<username>", methods=["GET", "POST"])
 def profile(username):
     # grab the session user's username from db
-    username = mongo.db.users.find_one(
+    username = mongo.db.user.find_one(
         {"username": session["user"]})["username"]
     return render_template("profile.html", username=username)
 
